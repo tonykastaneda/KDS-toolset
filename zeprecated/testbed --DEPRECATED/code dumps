@@ -1,0 +1,170 @@
+      // If an action is defined, do the action
+        if (action) {
+            app.doScript(action, 'Default Actions');
+        }
+
+
+
+
+        function runScript(names, outputLocation, height, action, width, originalFileLocation) {
+    for (var i = 0; i < names.length; i++) {
+        var doc = app.open(new File(originalFileLocation)); // Open the original file
+        app.activeDocument = doc; // Make the opened document the active document
+
+        var textFrame = doc.pageItems.getByName("nameplaceholder"); // Get the text frame by name
+
+        if (textFrame.typename !== "TextFrame") {
+            alert("Error: 'nameplaceholder' is not a TextFrame.");
+            return;
+        }
+
+        // Modify the text frame
+        textFrame.contents = names[i]; // Change the contents to the current name
+
+        // If width or height aren't 'keep' or 'dontModify', set them
+        if (width !== 'keep' && width !== 'dontModify') {
+            textFrame.width = width;
+        }
+        if (height !== 'keep' && height !== 'dontModify') {
+            textFrame.height = height;
+        }
+
+     // If an action is defined, do the action
+     if (action) {
+        app.doScript(action, 'Default Actions');
+    }
+
+        // Save the document to the output location
+        var timestamp = new Date().getTime(); // Get the current timestamp
+        var outputFile = new File(outputLocation + "/" + names[i] + "_" + timestamp + ".ai");
+        doc.saveAs(outputFile);
+
+        doc.close(SaveOptions.DONOTSAVECHANGES); // Close the document without saving changes
+    }
+}
+
+
+
+
+
+// Add input for action
+var actionGroup = modifyPanel.add("group");
+actionGroup.add("statictext", undefined, "Action Name:");
+var actionInput = actionGroup.add("edittext", undefined, "Action 1");
+actionInput.characters = 10;
+actionInput.onChanging = function () {
+    if (actionInput.text !== "") {
+        skipActionCheckbox.value = false;
+    }
+}
+// Add checkbox for skipping action
+var skipActionCheckbox = actionGroup.add("checkbox", undefined, "Skip action");
+skipActionCheckbox.value = false;
+skipActionCheckbox.onClick = function () {
+    if (skipActionCheckbox.value) {
+        actionInput.text = "";
+    }
+}
+
+
+
+
+        // Run the action
+        if (!skipAction) {
+            app.doScript(action, "Default Actions");
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OLD WAY
+
+
+// Add input for action
+var actionGroup = modifyPanel.add("group");
+actionGroup.add("statictext", undefined, "Action Name:");
+var actionInput = actionGroup.add("edittext", undefined, "Action 1");
+actionInput.characters = 10;
+actionInput.onChanging = function () {
+    if (actionInput.text !== "") {
+        skipActionCheckbox.value = false;
+    }
+}
+// Add checkbox for skipping action
+var skipActionCheckbox = actionGroup.add("checkbox", undefined, "Skip action");
+skipActionCheckbox.value = false;
+skipActionCheckbox.onClick = function () {
+    if (skipActionCheckbox.value) {
+        actionInput.text = "";
+    }
+}
+
+
+
+
+
+NEW BROKEN
+
+        // Create group for Actions
+        var actionGroup = modifyPanel.add("group");
+        actionGroup.orientation = "row";
+        actionGroup.alignChildren = "left";
+        actionGroup.add("statictext", undefined, "Name of Action:");
+        var actionInput = actionGroup.add("edittext", undefined, "");
+        actionInput.preferredSize.width = 200;
+        var skipActionCheckbox = actionGroup.add("checkbox", undefined, "Skip Action");
+
+
+
+
+
+
+WORKING 746
+
+function runScript(names, outputLocation, height, action, width, originalFileLocation) {
+    for (var i = 0; i < names.length; i++) {
+        var doc = app.open(new File(originalFileLocation)); // Open the original file
+        app.activeDocument = doc; // Make the opened document the active document
+
+        var textFrame = doc.pageItems.getByName("nameplaceholder"); // Get the text frame by name
+
+        if (textFrame.typename !== "TextFrame") {
+            alert("Error: 'nameplaceholder' is not a TextFrame.");
+            return;
+        }
+
+        // Modify the text frame
+        textFrame.contents = names[i]; // Change the contents to the current name
+
+        // If width or height aren't 'keep' or 'dontModify', set them
+        if (width !== 'keep' && width !== 'dontModify') {
+            textFrame.width = width;
+        }
+        if (height !== 'keep' && height !== 'dontModify') {
+            textFrame.height = height;
+        }
+
+
+        // Run the action
+        if (!skipAction) {
+            app.doScript(action, "Default Actions");
+        }
+
+        // Save the document to the output location
+        var timestamp = new Date().getTime(); // Get the current timestamp
+        var outputFile = new File(outputLocation + "/" + names[i] + "_" + timestamp + ".ai");
+        doc.saveAs(outputFile);
+
+        doc.close(SaveOptions.DONOTSAVECHANGES); // Close the document without saving changes
+    }
+}
